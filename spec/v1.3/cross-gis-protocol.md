@@ -263,7 +263,45 @@ Spatial AI / GeoAI / World Model
 
 A world model may use VFM to represent state consistently, but VFM itself remains the interoperability protocol.
 
-## 8. Layering rule for VFM 1.x
+## 8. Operational boundary and WebGIS reference path
+
+VFM is deliberately positioned between data producers and data consumers. It does not directly define field acquisition, digitizing/editing or general spatial-analysis operations. Its operational scope is conversion/normalization, packaging, chunking/indexing, integrity/security, distribution, lightweight visualization profiles, versioning and preservation.
+
+The first reference runtime path is WebGIS:
+
+```text
+VFM dataset
+   |
+   v
+VFM manifest
+   |
+   v
+PMTiles / MVT web profile
+   |
+   v
+static HTTP Range storage
+   |
+   v
+MapLibre GL JS
+   |
+   v
+WebGIS
+```
+
+MapLibre GL JS is a reference renderer, not a normative part of dataset identity. Cloudflare R2 is a reference S3/HTTP-compatible deployment backend, not a required VFM service. Providers may be replaced without changing the VFM Dataset Identity.
+
+IPFS, content-addressed storage and blockchain registries are optional trust/distribution adapters. They MUST NOT be required for the baseline WebGIS render path.
+
+Recommended invariants:
+
+- a VFM dataset remains renderable without blockchain, IPFS, AI, MCP or a GIS server;
+- a Web Profile can be served from static HTTP-compatible storage;
+- the logical application entry point is one VFM manifest even if the runtime performs many byte-range/chunk requests;
+- canonical VFM data and optimized web-delivery representations may coexist without conflating their roles.
+
+See `web-runtime-profile.md`.
+
+## 9. Layering rule for VFM 1.x
 
 The architecture is intentionally layered:
 
@@ -284,7 +322,7 @@ Layer 1  VFM Core Binary
 **Core Freeze Candidate 1.3 freezes Layer 1.**  
 Layers 2 and 3 may evolve by additive specification and profiles as long as they do not change frozen Core 1.x wire structures.
 
-## 9. Design principles
+## 10. Design principles
 
 VFM development should follow these principles:
 
@@ -299,6 +337,6 @@ VFM development should follow these principles:
 9. **AI is a consumer, not the definition of VFM.**
 10. **The protocol should let old and new systems coexist.**
 
-## 10. One-sentence positioning
+## 11. One-sentence positioning
 
-> **VFM is a cross-GIS protocol that maintains consistent identity, spatial/temporal reference, relationships, provenance and integrity across heterogeneous representations of the same world.**
+> **VFM is a cross-GIS / cross-dataset data protocol for converting, packaging, protecting, distributing, visualizing and preserving heterogeneous spatial-temporal datasets while maintaining consistent identity, reference, relationships, provenance and integrity across systems.**

@@ -11,8 +11,8 @@
 </style>
 </head>
 <body>
-<header><div class="bar"><span class="brand">VFM // 1.3</span><span class="tag">CROSS-GIS PROTOCOL</span><nav><a href="#protocol">Protocol</a><a href="#freeze">Freeze</a><a href="#wire">Wire</a><a href="#integrity">Integrity</a><a href="#failure">Failure</a><a href="#proof">Proof</a><a href="#fixtures">Fixtures</a></nav></div></header>
-<div class="hero"><div><div>VIETFLEX MAP FORMAT // 27-09-2026</div><h1>VFM Cross-GIS Protocol</h1><p>VFM là giao thức liên thông giữa các tập liệu không gian dị thể. Mục tiêu không phải ép mọi dữ liệu vào một định dạng duy nhất, mà duy trì identity, hệ quy chiếu/frame, thời gian, quan hệ, provenance và integrity nhất quán giữa nhiều biểu diễn của cùng một thế giới.</p><div class="quote"><strong>Protocol first. File second.</strong><br/><code>VFM != .vfm · .vfm is one encoding of the VFM Protocol</code><br/><br/><strong>Freeze the core. Extend by profile.</strong><br/><code>Single-file · little-endian · range-addressable · content-verifiable · profile-extensible</code></div></div></div>
+<header><div class="bar"><span class="brand">VFM // 1.3</span><span class="tag">CROSS-GIS DATA PROTOCOL</span><nav><a href="#protocol">Protocol</a><a href="#scope">Scope</a><a href="#web">WebGIS</a><a href="#freeze">Freeze</a><a href="#wire">Wire</a><a href="#integrity">Integrity</a><a href="#proof">Proof</a><a href="#fixtures">Fixtures</a></nav></div></header>
+<div class="hero"><div><div>VIETFLEX MAP FORMAT // 27-09-2026</div><h1>VFM Cross-GIS Data Protocol</h1><p>VFM là lớp dữ liệu giữa nơi tạo dữ liệu và nơi khai thác dữ liệu: chuyển đổi, đóng gói, định danh, lập chỉ mục, bảo vệ, phân phối, trực quan hóa và bảo tồn. VFM không cố trở thành phần mềm biên tập hay phân tích GIS.</p><div class="quote"><strong>Protocol first. File second.</strong><br/><code>VFM != GIS editor · VFM != analysis engine · VFM != one storage provider</code><br/><br/><strong>Thin runtime. Stable WebGIS.</strong><br/><code>One Dataset → One Manifest → PMTiles/MVT → HTTP Range → MapLibre</code></div></div></div>
 <main>
 <section id="protocol"><h2>00 // VFM là gì?</h2>
 <p><strong>VFM là một Cross-GIS interoperability protocol.</strong> Nó chuẩn hóa cách các tập liệu không gian hiểu nhau, không bắt mọi tập liệu phải được lưu giống nhau.</p>
@@ -44,6 +44,54 @@ Sensors / SLAM / trajectories --/</pre>
           .vfm binary / API / stream / database representation</pre>
 <p><code>VFM != .vfm</code>. Tệp <code>.vfm</code> là một encoding/container của protocol. Binary Core 1.3 ở các phần dưới được đóng băng để bảo đảm deterministic interoperability, trong khi domain semantics tiếp tục mở rộng bằng profile.</p>
 <p><a href="spec/v1.3/cross-gis-protocol.md"><strong>Đọc Cross-GIS Protocol Model</strong></a> · <a href="spec/v1.3/core-binary.md">Đọc Core Binary Specification</a></p>
+</section>
+
+<section id="scope"><h2>00A // Operational Scope</h2>
+<p><strong>VFM tập trung vào vòng đời dữ liệu, không thay thế GIS.</strong> Dữ liệu được tạo ở survey/GIS/BIM/IoT/DB; VFM tiếp nhận để chuẩn hóa và chuyển tiếp sang các hệ tiêu thụ.</p>
+<pre>DATA PRODUCERS
+survey / GIS / BIM / IoT / imagery / databases
+        |
+        v
+VFM
+convert · package · chunk · index · protect
+distribute · visualize · version · preserve
+        |
+        v
+DATA CONSUMERS
+WebGIS / GIS / BIM / Twin / AI / archive</pre>
+<div class="grid">
+<div class="card"><span class="k">VFM DOES</span><br/>Convert · normalize · package · index · LOD · integrity · encrypt/sign · distribute · preview · preserve.</div>
+<div class="card"><span class="k">VFM DOES NOT</span><br/>Field capture · digitize/edit · cartographic authoring · buffer/overlay/network analysis · general GIS analytics.</div>
+</div>
+<p class="ok"><strong>Architecture rule:</strong> storage, gateway, renderer và blockchain đều có thể thay thế; VFM Dataset Identity và frozen Core contract mới là phần phải ổn định.</p>
+</section>
+<section id="web"><h2>00B // WebGIS Reference Stack</h2>
+<p>Hiển thị WebGIS là reference path quan trọng nhất, nhưng được giữ rất mỏng để không làm VFM phụ thuộc vào một hệ thống lớn.</p>
+<pre>VFM Dataset
+    |
+    v
+dataset.vfmm             ONE LOGICAL ENTRY
+    |
+    v
+VFM Web Profile
+    |
+    +--> PMTiles / MVT   delivery profile
+    |
+    v
+HTTP Range + cache
+    |
+    v
+R2 / S3-compatible storage
+    |
+    v
+MapLibre GL JS
+    |
+    v
+WebGIS</pre>
+<p><strong>Reference stack 1.0:</strong> MapLibre GL JS = renderer; PMTiles/MVT = Web delivery profile; Cloudflare R2 = current reference object-store deployment. Chỉ HTTP-compatible behavior là contract; tên nhà cung cấp không phải một phần của VFM.</p>
+<p class="ok"><strong>One Dataset → One Manifest → One Runtime API → One Data Domain.</strong></p>
+<p class="warn"><strong>Critical-path invariant:</strong> VFM WebGIS phải tiếp tục render khi IPFS, blockchain, AI, MCP hoặc GIS server không tồn tại. IPFS/content addressing và blockchain registry thuộc trust/archive adapters, không thuộc render path.</p>
+<p><a href="spec/v1.3/web-runtime-profile.md"><strong>Đọc VFM Web Runtime Profile</strong></a></p>
 </section>
 <section id="freeze"><h2>01 // Core Freeze Contract</h2><p>Core Binary là <strong>Layer 1</strong> của VFM: deterministic container, addressing, integrity và profile discovery. Định vị Cross-GIS Protocol ở Layer 2 không thay đổi bất kỳ byte nào của Frozen Core 1.3.</p><div class="grid"><div class="card"><span class="k">Magic</span><br/>56 46 4D 00 0D 0A 1A 0A</div><div class="card"><span class="k">Endian</span><br/>Little-endian ONLY</div><div class="card"><span class="k">Header</span><br/>256 bytes</div><div class="card"><span class="k">Directory Entry</span><br/>64 bytes</div><div class="card"><span class="k">Chunk Descriptor</span><br/>128 bytes</div><div class="card"><span class="k">HashRecord</span><br/>48 bytes</div><div class="card"><span class="k">Integrity</span><br/>CRC32C + SHA-256</div><div class="card"><span class="k">META/PROF</span><br/>Deterministic CBOR</div></div><p class="warn"><strong>Core 1.x invariant:</strong> đổi byte order, kích thước Header/Directory/Chunk Descriptor hoặc nghĩa field đã đóng băng phải lên major version mới. Reserved bits/bytes trong 1.x luôn bằng 0.</p></section>
 <section id="wire"><h2>02 // Frozen Wire Layout</h2><pre>Byte 0

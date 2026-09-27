@@ -65,6 +65,99 @@ The core interoperability primitives are:
 
 See: [VFM 1.3 Cross-GIS Protocol Model](spec/v1.3/cross-gis-protocol.md).
 
+
+## Operational scope: what VFM does and does not do
+
+VFM is intentionally **not** a data-capture tool, GIS editor or spatial-analysis engine. Its durable role is the data layer between producers and consumers.
+
+```text
+Source systems
+survey / GIS / BIM / IoT / imagery / databases
+        |
+        v
+VFM
+normalize -> convert -> package -> index -> protect
+         -> distribute -> visualize -> preserve
+        |
+        v
+Consumer systems
+WebGIS / GIS / BIM / Digital Twin / AI / archive
+```
+
+VFM SHOULD focus on:
+
+- **digital conversion and normalization** between heterogeneous datasets;
+- **containerization, chunking, indexing and LOD** for partial/random access;
+- **stable identity, time, spatial reference and relationships**;
+- **integrity, signing and optional encryption**;
+- **distribution and cache-friendly delivery**;
+- **lightweight visualization profiles** for inspection and WebGIS;
+- **versioning, provenance and long-term preservation**.
+
+VFM does **not** define field acquisition, digitizing/editing workflows, cartographic authoring, buffer/intersection/network analysis or general GIS analytics. Those remain the responsibility of GIS/BIM/GeoAI tools.
+
+## WebGIS reference stack: thin, stable, replaceable
+
+WebGIS display is the first operational reference path for VFM, but the renderer and storage backend are deliberately kept outside the frozen Core.
+
+```text
+ONE DATASET
+    |
+    v
+dataset.vfmm               <- one logical entry point
+    |
+    v
+VFM Web Profile
+    |
+    +--> PMTiles / MVT     <- reference delivery profile
+    |
+    v
+HTTP Range / cache
+    |
+    v
+R2 / S3-compatible object storage
+    |
+    v
+MapLibre GL JS             <- reference renderer
+    |
+    v
+WebGIS
+```
+
+The reference implementation principle is:
+
+> **One Dataset -> One Manifest -> One Runtime API -> One Data Domain.**
+
+MapLibre GL JS is a **reference renderer**, not part of VFM identity. Cloudflare R2 is a **reference deployment backend**, not a required VFM service. PMTiles/MVT is the recommended WebGIS delivery profile so the browser does not need to decode the entire canonical VFM dataset.
+
+The Web runtime contract SHOULD require only standard web capabilities such as HTTPS GET, byte-range requests, CORS, cache metadata and immutable/versioned assets.
+
+Two architectural invariants are recommended:
+
+> **A VFM dataset MUST remain renderable without blockchain, IPFS, AI, MCP or a GIS server.**
+
+> **The VFM Web Profile SHOULD be renderable by a standard MapLibre client from static HTTP-compatible object storage.**
+
+## Optional trust and decentralized distribution
+
+IPFS, content-addressed storage and blockchain are future/optional adapters, not the WebGIS critical path.
+
+```text
+                     VFM
+                      |
+             +--------+---------+
+             |                  |
+             v                  v
+       Web render path      Trust/archive path
+       PMTiles + HTTP       hash / signature
+       R2/S3 + MapLibre     IPFS / blockchain
+             |                  |
+             v                  v
+           WebGIS          verify / provenance
+```
+
+If IPFS or a blockchain registry is unavailable, the reference WebGIS path MUST continue to operate. Storage, gateway and blockchain providers are replaceable; VFM dataset identity is not.
+
 ## Core 1.3: what is frozen
 
 VFM 1.3 freezes the **binary Core** before expanding domain profiles. The Core remains intentionally small: container structure, identity, byte addressing, integrity, profile discovery and deterministic conformance.
@@ -200,15 +293,22 @@ The site presents both the cross-GIS protocol positioning and the frozen byte-le
 
 ## Current status
 
-- **Protocol positioning:** Cross-GIS interoperability protocol.
-- **Binary layer:** VFM 1.3 Core Freeze Candidate.
-- **Reference implementation:** Rust + independent Python generator.
+- **Repository:** https://github.com/Base27-CVNSS/VFM
+- **Specification site:** https://base27-cvnss.github.io/VFM/
+- **Protocol positioning:** cross-GIS / cross-dataset spatial data protocol focused on conversion, packaging, integrity, delivery, visualization and preservation.
+- **Binary layer:** VFM 1.3 Core Freeze Candidate; the frozen byte contract is unchanged by this architecture update.
+- **Reference implementation:** Rust reader/writer + independent Python generator.
 - **Conformance:** byte-identical golden fixture + malformed corpus.
+- **WebGIS reference stack:** VFM Manifest -> PMTiles/MVT -> static HTTP Range storage -> MapLibre GL JS.
+- **Reference storage deployment:** Cloudflare R2 or any equivalent S3/HTTP-compatible object store; VFM does not depend on R2 identity.
+- **Optional extensions:** IPFS/content addressing and blockchain registry are outside the render critical path.
 - **CI:** Rust stable compiles and runs the conformance suite.
 - **Pages:** deployed through GitHub Actions.
+
+The repository commit supplied earlier, `6b80330ff4ff79180ee81d0e792532360b008c0d`, is an earlier Core-fix commit rather than the current repository HEAD. This update advances documentation/architecture only; it does not change the frozen Core 1.3 structs.
 
 VFM is **not** currently an OGC/ISO/IETF standard. Draft 1.0–1.2 were exploratory and are not byte-stable compatibility targets.
 
 ## One-sentence positioning
 
-> **VFM is a cross-GIS protocol that maintains consistent identity, spatial/temporal reference, relationships, provenance and integrity across heterogeneous representations of the same world.**
+> **VFM is a cross-GIS / cross-dataset data protocol that converts, packages, protects, distributes, visualizes and preserves heterogeneous spatial-temporal data while keeping identity, reference, relationships, provenance and integrity consistent across systems.**
