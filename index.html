@@ -11,8 +11,8 @@
 </style>
 </head>
 <body>
-<header><div class="bar"><span class="brand">VFM // 1.3</span><span class="tag">CROSS-GIS DATA PROTOCOL</span><nav><a href="#protocol">Protocol</a><a href="#scope">Scope</a><a href="#web">WebGIS</a><a href="#freeze">Freeze</a><a href="#wire">Wire</a><a href="#integrity">Integrity</a><a href="#proof">Proof</a><a href="#fixtures">Fixtures</a></nav></div></header>
-<div class="hero"><div><div>VIETFLEX MAP FORMAT // 27-09-2026</div><h1>VFM Cross-GIS Data Protocol</h1><p>VFM là lớp dữ liệu giữa nơi tạo dữ liệu và nơi khai thác dữ liệu: chuyển đổi, đóng gói, định danh, lập chỉ mục, bảo vệ, phân phối, trực quan hóa và bảo tồn. VFM không cố trở thành phần mềm biên tập hay phân tích GIS.</p><div class="quote"><strong>Protocol first. File second.</strong><br/><code>VFM != GIS editor · VFM != analysis engine · VFM != one storage provider</code><br/><br/><strong>Thin runtime. Stable WebGIS.</strong><br/><code>One Dataset → One Manifest → PMTiles/MVT → HTTP Range → MapLibre</code></div></div></div>
+<header><div class="bar"><span class="brand">VFM // 1.3</span><span class="tag">CROSS-GIS DATA PROTOCOL</span><nav><a href="#protocol">Protocol</a><a href="#scope">Scope</a><a href="#web">WebGIS</a><a href="#world">World Model</a><a href="#freeze">Freeze</a><a href="#wire">Wire</a><a href="#integrity">Integrity</a><a href="#proof">Proof</a><a href="#fixtures">Fixtures</a></nav></div></header>
+<div class="hero"><div><div>VIETFLEX MAP FORMAT // 27-09-2026</div><h1>VFM Cross-GIS Data Protocol</h1><p>VFM là lớp dữ liệu giữa thế giới vật lý và hệ thống khai thác dữ liệu: chuyển đổi, đóng gói, định danh, lập chỉ mục, bảo vệ, phân phối, trực quan hóa và bảo tồn. VFM không chỉ phục vụ GIS/WebGIS mà còn hướng tới biểu diễn world-state có cấu trúc cho Digital Twin, GeoAI, Agent và Physical World Model.</p><div class="quote"><strong>Protocol first. File second.</strong><br/><code>VFM != GIS editor · VFM != analysis engine · VFM != one storage provider</code><br/><br/><strong>Thin runtime. Stable WebGIS.</strong><br/><code>One Dataset → One Manifest → PMTiles/MVT → HTTP Range → MapLibre</code></div></div></div>
 <main>
 <section id="protocol"><h2>00 // VFM là gì?</h2>
 <p><strong>VFM là một Cross-GIS interoperability protocol.</strong> Nó chuẩn hóa cách các tập liệu không gian hiểu nhau, không bắt mọi tập liệu phải được lưu giống nhau.</p>
@@ -92,6 +92,57 @@ WebGIS</pre>
 <p class="ok"><strong>One Dataset → One Manifest → One Runtime API → One Data Domain.</strong></p>
 <p class="warn"><strong>Critical-path invariant:</strong> VFM WebGIS phải tiếp tục render khi IPFS, blockchain, AI, MCP hoặc GIS server không tồn tại. IPFS/content addressing và blockchain registry thuộc trust/archive adapters, không thuộc render path.</p>
 <p><a href="spec/v1.3/web-runtime-profile.md"><strong>Đọc VFM Web Runtime Profile</strong></a></p>
+</section>
+<section id="world"><h2>00C // Physical World Data Layer</h2>
+<p><strong>VFM không phải raster-only, vector-only, LLM, RAG hay World Model.</strong> VFM là lớp biểu diễn dữ liệu có cấu trúc mà các hệ đó có thể dùng để lưu, truy xuất, kiểm chứng và học về thế giới vật lý.</p>
+<pre>VFM WORLD STATE =
+Space + Time + Object + State + Sensor + History + Relation
++ Semantics + Provenance + Confidence
+
+Optional physical-dynamics profiles:
++ Dynamics + Constraints + Actions + Uncertainty</pre>
+<div class="grid">
+<div class="card"><span class="k">World Memory</span><br/>Lưu lịch sử trạng thái, quan sát, biến đổi và provenance của thực thể.</div>
+<div class="card"><span class="k">World State</span><br/>Biểu diễn trạng thái hiện tại theo không gian-thời gian, object ID và quan hệ.</div>
+<div class="card"><span class="k">AI Dataset</span><br/>Cung cấp training samples, multimodal context và dữ liệu có version/hash rõ ràng.</div>
+<div class="card"><span class="k">Retrieval Layer</span><br/>Spatial/Temporal/Semantic retrieval cho RAG, Agent và tool-using AI.</div>
+</div>
+<h3>Seven VFM principles</h3>
+<table><thead><tr><th>Principle</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>Access</td><td>Read only what you need — random access, chunk, index, byte range.</td></tr>
+<tr><td>Universal</td><td>One logical dataset across local, Web, cloud, CDN and offline.</td></tr>
+<tr><td>Integrity</td><td>Deterministic bytes, hashes, signatures and provenance.</td></tr>
+<tr><td>Delta</td><td>Update only what changed; avoid rewriting the whole world.</td></tr>
+<tr><td>Time</td><td>Space and time are explicit and native to state/observation profiles.</td></tr>
+<tr><td>Semantics</td><td>Stable IDs, schema bindings, units, relations and quality travel with data.</td></tr>
+<tr><td>LOD</td><td>Resolution follows need through progressive and adaptive access.</td></tr>
+</tbody></table>
+<p class="ok"><strong>Performance invariant:</strong> <code>session_cost = f(area, time, layers, fields, LOD)</code>, không phải <code>f(total_dataset_size)</code>. Một dataset logic 500 GB có thể chỉ cần vài MB cho một view hoặc AI batch nếu profile/index cho phép selective access.</p>
+<h3>Multi-model by design</h3>
+<pre>VFM
+ +-- Vector / topology / network
+ +-- Raster / imagery / DEM
+ +-- Point cloud / LiDAR
+ +-- 3D / BIM / mesh
+ +-- Sensor / time-series
+ +-- Semantic / metadata / relations
+ +-- Future profile-defined payloads</pre>
+<p class="warn"><strong>Boundary:</strong> Frozen Core 1.3 chỉ giữ container/addressing/integrity/profile discovery. World-state semantics, AI, dynamics và multimodal payloads phải mở rộng bằng profile — không làm nở Core.</p>
+<pre>REAL WORLD
+   ↓
+GIS / BIM / Sensors / Imagery / IoT / LiDAR
+   ↓
+VFM WORLD DATA
+   ├── Training Dataset
+   ├── Spatial / Multimodal Retrieval
+   └── Live World State
+   ↓
+AI / LLM / WORLD MODEL
+   ↓
+Reasoning / Simulation / Planning / Agent
+   ↓
+ACTION → REAL WORLD</pre>
+<p><strong>Định vị dài hạn:</strong> VFM là một structured spatiotemporal representation layer for the physical world — phục vụ storage, retrieval, verification, versioning và machine intelligence.</p>
 </section>
 <section id="freeze"><h2>01 // Core Freeze Contract</h2><p>Core Binary là <strong>Layer 1</strong> của VFM: deterministic container, addressing, integrity và profile discovery. Định vị Cross-GIS Protocol ở Layer 2 không thay đổi bất kỳ byte nào của Frozen Core 1.3.</p><div class="grid"><div class="card"><span class="k">Magic</span><br/>56 46 4D 00 0D 0A 1A 0A</div><div class="card"><span class="k">Endian</span><br/>Little-endian ONLY</div><div class="card"><span class="k">Header</span><br/>256 bytes</div><div class="card"><span class="k">Directory Entry</span><br/>64 bytes</div><div class="card"><span class="k">Chunk Descriptor</span><br/>128 bytes</div><div class="card"><span class="k">HashRecord</span><br/>48 bytes</div><div class="card"><span class="k">Integrity</span><br/>CRC32C + SHA-256</div><div class="card"><span class="k">META/PROF</span><br/>Deterministic CBOR</div></div><p class="warn"><strong>Core 1.x invariant:</strong> đổi byte order, kích thước Header/Directory/Chunk Descriptor hoặc nghĩa field đã đóng băng phải lên major version mới. Reserved bits/bytes trong 1.x luôn bằng 0.</p></section>
 <section id="wire"><h2>02 // Frozen Wire Layout</h2><pre>Byte 0
