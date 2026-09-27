@@ -158,6 +158,91 @@ IPFS, content-addressed storage and blockchain are future/optional adapters, not
 
 If IPFS or a blockchain registry is unavailable, the reference WebGIS path MUST continue to operate. Storage, gateway and blockchain providers are replaceable; VFM dataset identity is not.
 
+## VFM as a Physical World Data Layer for AI
+
+The long-term direction of VFM is broader than WebGIS delivery. VFM SHOULD be capable of representing a **machine-readable state of the physical world** without making AI, LLMs or any specific model part of the frozen Core.
+
+The conceptual world-state tuple is:
+
+```text
+VFM World State =
+Space + Time + Object + State + Sensor + History + Relation
++ Semantics + Provenance + Confidence
+```
+
+For predictive and embodied systems, domain profiles MAY extend this with:
+
+```text
+Dynamics + Constraints + Actions + Uncertainty
+```
+
+This makes VFM suitable as a **grounded spatial memory / retrieval substrate** for GIS, Digital Twins, multimodal AI, robotics and future physical-world models.
+
+VFM is not itself an LLM, RAG system or World Model. Its role is the structured data layer beneath them:
+
+```text
+REAL WORLD
+    |
+    v
+GIS / BIM / Sensors / Imagery / IoT / LiDAR
+    |
+    v
+VFM WORLD DATA
+    |
+    +--> TRAINING DATASET
+    +--> SPATIAL / MULTIMODAL RETRIEVAL
+    +--> LIVE WORLD STATE
+    |
+    v
+AI / LLM / WORLD MODEL
+    |
+    v
+Reasoning / Simulation / Planning / Agent
+    |
+    v
+ACTION -> REAL WORLD
+```
+
+### Seven VFM principles
+
+The architecture is guided by seven long-term principles:
+
+1. **Access — Read only what you need.** Random access, chunking, spatial/temporal indexes and byte-range delivery.
+2. **Universal — One dataset, many environments.** Local, Web, cloud, CDN and offline use without changing logical identity.
+3. **Integrity — Trust every byte.** Deterministic encoding, hashes, signatures and provenance.
+4. **Delta — Update only what changed.** Base + delta + versioning rather than rewriting whole datasets.
+5. **Time — Space and time are native.** Objects, observations and state transitions are explicitly time-bound.
+6. **Semantics — Meaning travels with data.** Stable IDs, schema bindings, relations, units, quality and machine-readable context.
+7. **LOD — Resolution follows need.** Progressive, multi-resolution and adaptive access.
+
+The target cost model is:
+
+```text
+session_cost = f(area, time, layers, fields, LOD)
+             != f(total_dataset_size)
+```
+
+A 500 GB logical VFM dataset may therefore require only a few megabytes for a particular view or AI batch if the relevant indexes, chunks and profiles allow selective access.
+
+### Multi-model, not raster-only or vector-only
+
+VFM SHOULD remain neutral to domain payload type. Raster and vector are payload families, not the definition of VFM.
+
+```text
+VFM
+  +-- Vector / topology / networks
+  +-- Raster / imagery / DEM
+  +-- Point cloud / LiDAR
+  +-- 3D / BIM / meshes
+  +-- Sensor / time-series
+  +-- Semantic / metadata / relations
+  +-- Future profile-defined payloads
+```
+
+The durable Core responsibility is **identity + space + time + index + integrity + profile discovery**. Domain-specific storage remains profile-driven.
+
+> **VFM is a structured, spatiotemporal representation layer for the physical world, designed for storage, retrieval, verification, versioning and machine intelligence.**
+
 ## Core 1.3: what is frozen
 
 VFM 1.3 freezes the **binary Core** before expanding domain profiles. The Core remains intentionally small: container structure, identity, byte addressing, integrity, profile discovery and deterministic conformance.
@@ -295,17 +380,22 @@ The site presents both the cross-GIS protocol positioning and the frozen byte-le
 
 - **Repository:** https://github.com/Base27-CVNSS/VFM
 - **Specification site:** https://base27-cvnss.github.io/VFM/
-- **Protocol positioning:** cross-GIS / cross-dataset spatial data protocol focused on conversion, packaging, integrity, delivery, visualization and preservation.
-- **Binary layer:** VFM 1.3 Core Freeze Candidate; the frozen byte contract is unchanged by this architecture update.
+- **Current repository HEAD before this documentation update:** `2e49dfef975b62174937edc1f3ab31047f044777` (`docs: freeze thin VFM WebGIS reference architecture`).
+- **Earlier supplied Core-fix commit:** `6b80330ff4ff79180ee81d0e792532360b008c0d`.
+- **Protocol positioning:** cross-GIS / cross-dataset spatial data protocol for consistent identity, reference, time, relationships, provenance and integrity.
+- **Binary layer:** VFM 1.3 Core Freeze Candidate; this update does **not** change frozen Header, Directory Entry, Chunk Descriptor, codec IDs, hash scope or failure behavior.
 - **Reference implementation:** Rust reader/writer + independent Python generator.
-- **Conformance:** byte-identical golden fixture + malformed corpus.
-- **WebGIS reference stack:** VFM Manifest -> PMTiles/MVT -> static HTTP Range storage -> MapLibre GL JS.
-- **Reference storage deployment:** Cloudflare R2 or any equivalent S3/HTTP-compatible object store; VFM does not depend on R2 identity.
-- **Optional extensions:** IPFS/content addressing and blockchain registry are outside the render critical path.
-- **CI:** Rust stable compiles and runs the conformance suite.
-- **Pages:** deployed through GitHub Actions.
-
-The repository commit supplied earlier, `6b80330ff4ff79180ee81d0e792532360b008c0d`, is an earlier Core-fix commit rather than the current repository HEAD. This update advances documentation/architecture only; it does not change the frozen Core 1.3 structs.
+- **Conformance:** deterministic golden fixtures + malformed corpus + byte-identical Rust/Python proof.
+- **CI baseline:** Rust stable compiles and the VFM 1.3 conformance suite has passed on the established Core baseline.
+- **GitHub Pages baseline:** deployed successfully through GitHub Actions.
+- **WebGIS reference path:** VFM Manifest -> PMTiles/MVT -> HTTP Range/object storage -> MapLibre GL JS.
+- **Reference storage:** Cloudflare R2 or equivalent S3/HTTP-compatible object storage; no provider is part of VFM identity.
+- **Data model direction:** multi-model container/protocol; VFM is **not raster-only and not vector-only**.
+- **Physical-world direction:** profiles may represent Space + Time + Object + State + Sensor + History + Relation + Semantics + Provenance + Confidence.
+- **AI direction:** VFM is a grounded spatial/world-memory and retrieval substrate for training datasets, Spatial/Multimodal RAG, live world state and future World Models; AI/LLM is a consumer, not part of the frozen Core.
+- **Seven long-term principles:** Access · Universal · Integrity · Delta · Time · Semantics · LOD.
+- **Primary performance invariant:** `session_cost = f(area,time,layers,fields,LOD)`, not total dataset size.
+- **Compatibility rule:** **Freeze the Core; extend by profile.**
 
 VFM is **not** currently an OGC/ISO/IETF standard. Draft 1.0–1.2 were exploratory and are not byte-stable compatibility targets.
 
