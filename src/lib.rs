@@ -82,11 +82,11 @@ pub fn read(b:&[u8])->Result<VfmFile,VfmError>{
 }
 
 fn align(v:usize,a:usize)->usize{(v+a-1)&!(a-1)}
-fn cbor_uint(n:u64)->Vec<u8>{match n{0..=23=>vec![n as u8],24..=255=>vec![0x18,n as u8],_=>unimplemented!("minimal fixture uses short CBOR integers")}}
+fn enc_uint(n:u64)->Vec<u8>{match n{0..=23=>vec![n as u8],24..=255=>vec![0x18,n as u8],_=>unimplemented!("minimal fixture uses short CBOR integers")}}
 fn cbor_bstr(b:&[u8])->Vec<u8>{assert!(b.len()<24);let mut v=vec![0x40|b.len()as u8];v.extend_from_slice(b);v}
 fn cbor_array(x:&[Vec<u8>])->Vec<u8>{assert!(x.len()<24);let mut v=vec![0x80|x.len()as u8];for i in x{v.extend_from_slice(i)}v}
-fn cbor_map(mut x:Vec<(u64,Vec<u8>)>)->Vec<u8>{x.sort_by_key(|x|x.0);let mut v=vec![0xa0|x.len()as u8];for(k,a)in x{v.extend(cbor_uint(k));v.extend(a)}v}
-fn meta()->Vec<u8>{cbor_map(vec![(0,cbor_array(&[cbor_uint(1),cbor_uint(3)])),(1,cbor_bstr(&DATASET_UUID)),(4,cbor_uint(3)),(5,cbor_uint(2))])}
+fn cbor_map(mut x:Vec<(u64,Vec<u8>)>)->Vec<u8>{x.sort_by_key(|x|x.0);let mut v=vec![0xa0|x.len()as u8];for(k,a)in x{v.extend(enc_uint(k));v.extend(a)}v}
+fn meta()->Vec<u8>{cbor_map(vec![(0,cbor_array(&[enc_uint(1),enc_uint(3)])),(1,cbor_bstr(&DATASET_UUID)),(4,enc_uint(3)),(5,enc_uint(2))])}
 fn hrec(id:u64,d:[u8;32])->[u8;48]{let mut o=[0;48];o[0]=1;o[1]=1;o[2]=32;o[3]=3;w64(&mut o,4,id);o[12..44].copy_from_slice(&d);o}
 fn dent(t:[u8;4],flags:u32,id:u64,off:u64,len:u64,crc:u32,href:u32)->[u8;64]{let mut o=[0;64];o[..4].copy_from_slice(&t);w32(&mut o,4,flags);w64(&mut o,8,id);w64(&mut o,16,off);w64(&mut o,24,len);w64(&mut o,32,len);w16(&mut o,42,1);w32(&mut o,48,crc);w32(&mut o,52,href);o}
 
