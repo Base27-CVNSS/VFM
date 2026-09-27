@@ -1,0 +1,11 @@
+{
+  "bad-content-hash.vfm":{"expected_error":"E0033","sha256":"4e03af337b65467b31d9b47c9bc4d11092c76e688613964a092e2a726a396b91","size":584},
+  "bad-directory-digest.vfm":{"expected_error":"E0012","sha256":"c1a3f5b14d44ecdc79ee89d91b89202424553b16b80bf78a9ab425b565b5f31c","size":584},
+  "bad-header-crc.vfm":{"expected_error":"E0005","sha256":"662a3d53798c044f94faea830d682dd71646b249f6b273fc6cdac3298ea473ca","size":584},
+  "bad-magic.vfm":{"expected_error":"E0001","sha256":"08dabda3813adbc48d76c36ec1e4bb1cbb4632a469f2223cabdfcde74e6d35f1","size":584},
+  "bad-root-digest.vfm":{"expected_error":"E0034","sha256":"688084ab75550c8f72c0e0ea91a10a74a71caa691f25dfb9ce9a847bc9e410cd","size":584},
+  "hash-ref-out-of-range.vfm":{"expected_error":"E0032","sha256":"f30d29b1ebc9cfbc618a36d8917a0c55d96986e1e4e0f176d5ef57fede119072","size":584},
+  "overlap.vfm":{"expected_error":"E0014","sha256":"a9a32dd77bfa59da96337ad795cabcbd304c47efe82ac2d96ff01492fbf36bc0","size":584},
+  "reserved-nonzero.vfm":{"expected_error":"E0006","sha256":"b7dbab558a7e2cb9942cb7c4414f5d730380570eca55a9518775d8848dcf94f3","size":584},
+  "unaligned-offset.vfm":{"expected_error":"E0015","sha256":"f98078c95ffa014f60d24c27086e5345f1cd3eff369215678b6a41a9943a1e3e","size":584}
+}
