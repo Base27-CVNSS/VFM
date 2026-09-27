@@ -1,0 +1,18 @@
+[package]
+name = "vfm-core"
+version = "0.1.0"
+edition = "2021"
+description = "Reference reader/writer for the VFM 1.3 Core Freeze Candidate"
+repository = "https://github.com/Base27-CVNSS/VFM"
+
+[dependencies]
+sha2 = "0.10"
+crc32c = "0.6"
+
+[lib]
+name = "vfm_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "vfm"
+path = "src/bin/vfm.rs"
