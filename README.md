@@ -1,8 +1,91 @@
-# VFM 1.3 — Core Freeze Candidate
+# VFM 1.3 — Cross-GIS Protocol / Core Freeze Candidate
 
-VFM (Vietflex Map Format) 1.3 freezes the **binary Core** before expanding domain profiles. The Core is intentionally small: container structure, identity, byte addressing, integrity, profile discovery and deterministic conformance.
+**VFM (Vietflex Map Format)** is positioned first as a **cross-GIS interoperability protocol** for heterogeneous spatial datasets.
+
+Its purpose is not to replace GeoJSON, GeoPackage, GeoParquet, COG, LAS/LAZ, IFC, CityGML, 3D Tiles, sensor APIs or other mature domain formats. VFM defines the common contract that lets those datasets identify and relate the **same physical or logical world** across systems.
+
+> **VFM standardizes how spatial datasets understand each other — not how every dataset must be physically stored.**
+
+The `.vfm` binary artifact is one normative encoding/container of that protocol.
+
+```text
+VFM Protocol
+    |
+    +-- Logical interoperability
+    |     identity
+    |     spatial reference / frames
+    |     time / state
+    |     relations / topology
+    |     semantics bindings
+    |     provenance
+    |     integrity
+    |
+    +-- Domain profiles
+    |     Feature / Raster / Point Cloud / 3D / BIM
+    |     Temporal / Sensor / GeoAI / Digital Twin / Robotics
+    |
+    +-- Encodings / transports
+          .vfm binary
+          API / stream
+          database representation
+          future serializations
+```
+
+Therefore:
+
+```text
+VFM != .vfm
+.vfm = one encoding of the VFM Protocol
+```
+
+## Why this matters
+
+The root problem in spatial digital transformation is not simply "too many file formats". The deeper problem is that multiple systems can describe the same real-world entity without a stable, machine-verifiable way to know that they refer to the same thing, in the same space and time.
+
+A bridge may exist as a GIS feature, an IFC object, a LiDAR segment, a drone observation, a sensor asset and a Digital Twin object. VFM should make those representations interoperable without forcing destructive conversion into one storage format.
+
+```text
+GeoJSON / GeoParquet / GPKG ----\
+COG / imagery -------------------\
+LAS / LAZ ------------------------> VFM Protocol ---> WebGIS
+IFC / BIM -----------------------/                  BIM
+3D Tiles / CityGML -------------/                   Digital Twin
+Sensors / SLAM / trajectories --/                    GeoAI / Robot
+```
+
+The core interoperability primitives are:
+
+- **stable identity** across native IDs;
+- **CRS / reference frames / units / transforms**;
+- **time and state**;
+- **relations and topology**;
+- **semantic bindings** without rewriting native schemas;
+- **provenance and transformation history**;
+- **content integrity and deterministic identity**.
+
+See: [VFM 1.3 Cross-GIS Protocol Model](spec/v1.3/cross-gis-protocol.md).
+
+## Core 1.3: what is frozen
+
+VFM 1.3 freezes the **binary Core** before expanding domain profiles. The Core remains intentionally small: container structure, identity, byte addressing, integrity, profile discovery and deterministic conformance.
 
 > **Freeze the core. Extend by profile.**
+
+The protocol model sits **above** this frozen wire layer. Defining VFM as a cross-GIS protocol does not change the already-frozen byte contract.
+
+```text
+Layer 4  Applications
+         WebGIS / Digital Twin / AI / Robot / Vehicle
+
+Layer 3  Domain Profiles
+         Feature / Raster / 3D / BIM / Sensor / Temporal / GeoAI
+
+Layer 2  Cross-GIS Logical Protocol
+         identity / frames / time / relations / provenance
+
+Layer 1  VFM Core Binary 1.3
+         deterministic container / addressing / integrity / profile discovery
+```
 
 ## What is real in this repository
 
@@ -15,23 +98,24 @@ This repository includes an executable conformance seed, not only a design docum
 - `tools/python_reference.py` — an **independent Python generator** that does not call the Rust implementation.
 - `tests/conformance.rs` — byte identity + malformed corpus tests.
 - `fixtures/malformed/` — fixtures targeting stable VFM error codes.
-- `index.html` — VFM 1.3 Core Binary Specification website.
+- `index.html` — VFM 1.3 specification website.
 - `spec/v1.3/core-binary.md` — normative text form of the frozen wire contract.
+- `spec/v1.3/cross-gis-protocol.md` — conceptual protocol model above the binary Core.
 
-The central interoperability proof is reproducible:
+The central Core interoperability proof is reproducible:
 
 ```text
 VFM 1.3 byte-level specification
-          │
-    ┌─────┴─────┐
-    ▼           ▼
+          |
+    +-----+-----+
+    v           v
 Rust writer   Python writer
-    │           │
-    └─────┬─────┘
-          ▼
+    |           |
+    +-----+-----+
+          v
   byte-for-byte cmp
-          │
-          ▼
+          |
+          v
 fixtures/golden/core-minimal.vfm
 SHA-256: 5b65b13e2ae03aa3697dc869edf5168e6601be7465b1eba10331c145ebaaeefc
 ```
@@ -53,6 +137,19 @@ SHA-256: 5b65b13e2ae03aa3697dc869edf5168e6601be7465b1eba10331c145ebaaeefc
 | META/PROF encoding | deterministic CBOR |
 
 Domain semantics such as Feature, Raster, 3D, Temporal, BIM, Sensor and GeoAI remain **outside the frozen Core** and evolve through profiles.
+
+## Design principles
+
+1. **Protocol first, file second.**
+2. **Stable identity over filename identity.**
+3. **Interoperability does not require destructive conversion.**
+4. **Space and time are explicit, never guessed.**
+5. **Relations are first-class data.**
+6. **Provenance is part of interoperability.**
+7. **Profiles extend the protocol without breaking Core.**
+8. **AI is a consumer of VFM, not the definition of VFM.**
+9. **Deterministic integrity remains machine-verifiable.**
+10. **Existing standards should be bridged, not replaced.**
 
 ## Build and validate
 
@@ -83,20 +180,35 @@ python tools/python_reference.py --fixtures-root .
 
 The current seed covers:
 
-- frozen 256-byte Header and 64-byte Directory Entry
-- frozen 128-byte ChunkDescriptor
-- deterministic byte output for `core-minimal.vfm`
-- Rust reader/writer and independent Python writer byte identity
-- CRC32C + SHA-256 integrity chain
-- stable failures for bad magic, Header CRC, reserved bits, Directory digest, unaligned offsets, overlapping ranges, invalid hash references, content hash mismatch and root digest mismatch
-- GitHub Actions CI that reproduces and compares the binary artifact
+- frozen 256-byte Header and 64-byte Directory Entry;
+- frozen 128-byte ChunkDescriptor;
+- deterministic byte output for `core-minimal.vfm`;
+- Rust reader/writer and independent Python writer byte identity;
+- CRC32C + SHA-256 integrity chain;
+- stable failures for bad magic, Header CRC, reserved bits, Directory digest, unaligned offsets, overlapping ranges, invalid hash references, content hash mismatch and root digest mismatch;
+- GitHub Actions CI that reproduces and compares the binary artifact.
 
 Fast-Open, optional compression and additional domain-profile golden vectors are later conformance expansions; they must not change the frozen Core 1.x structs.
 
 ## Website
 
-`index.html` is a standalone VFM 1.3 specification site suitable for GitHub Pages. A Pages workflow is included. If Pages is not already enabled for this repository, select **Settings → Pages → Source: GitHub Actions** once.
+VFM 1.3 specification site:
 
-## Status
+**https://base27-cvnss.github.io/VFM/**
 
-**Core Freeze Candidate**, not an OGC/ISO/IETF standard. Draft 1.0–1.2 were exploratory and are not byte-stable compatibility targets.
+The site presents both the cross-GIS protocol positioning and the frozen byte-level Core. GitHub Pages deploys from Actions.
+
+## Current status
+
+- **Protocol positioning:** Cross-GIS interoperability protocol.
+- **Binary layer:** VFM 1.3 Core Freeze Candidate.
+- **Reference implementation:** Rust + independent Python generator.
+- **Conformance:** byte-identical golden fixture + malformed corpus.
+- **CI:** Rust stable compiles and runs the conformance suite.
+- **Pages:** deployed through GitHub Actions.
+
+VFM is **not** currently an OGC/ISO/IETF standard. Draft 1.0–1.2 were exploratory and are not byte-stable compatibility targets.
+
+## One-sentence positioning
+
+> **VFM is a cross-GIS protocol that maintains consistent identity, spatial/temporal reference, relationships, provenance and integrity across heterogeneous representations of the same world.**
