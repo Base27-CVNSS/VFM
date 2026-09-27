@@ -3,18 +3,49 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="description" content="VFM 1.3 Core Freeze Candidate — byte-level binary specification and reference implementation."/>
-<title>VFM 1.3 — Core Freeze Candidate</title>
+<meta name="description" content="VFM 1.3 — Cross-GIS interoperability protocol with a frozen byte-level binary Core and reference implementation."/>
+<title>VFM 1.3 — Cross-GIS Protocol / Core Freeze Candidate</title>
 <style>
 :root{--ink:#0b2447;--line:#cbd7e6;--soft:#f4f8fc;--blue:#004b9b;--code:#061525;--green:#126b3a;--red:#a32222;--max:1180px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:#17202a;font:15px/1.55 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}a{color:var(--blue)}header{position:sticky;top:0;background:#fff;border-bottom:2px solid var(--ink);z-index:5}.bar{max-width:var(--max);margin:auto;padding:10px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}.brand{font-weight:900;color:var(--ink);font-size:18px}.tag{border:1px solid var(--ink);padding:2px 7px}.bar nav{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}.bar nav a{text-decoration:none;font-weight:700}.hero{background:var(--ink);color:#fff}.hero>div{max-width:var(--max);margin:auto;padding:52px 18px}.hero h1{font-size:clamp(36px,6vw,68px);margin:0 0 8px;letter-spacing:-.04em}.hero p{max-width:920px;font-size:17px}.hero code{color:#bfe1ff}.quote{border:1px solid #7fb0df;padding:14px;margin-top:22px;background:#0d315d}main{max-width:var(--max);margin:auto;padding:22px 18px 70px}section{padding:26px 0;border-bottom:1px solid var(--line)}h2{color:var(--ink);font-size:28px;margin:0 0 10px}h3{color:var(--blue);margin-top:26px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}th,td{border:1px solid var(--line);padding:7px;vertical-align:top}th{background:#eaf2fb;color:var(--ink);text-align:left}pre{background:var(--code);color:#d9ecff;padding:16px;overflow:auto;border:1px solid #23405e}code{font-family:inherit}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.card{border:1px solid var(--line);padding:14px;background:var(--soft)}.ok{border-left:5px solid var(--green);padding:12px;background:#f1faf5}.warn{border-left:5px solid #9b6b00;padding:12px;background:#fff9e8}.bad{border-left:5px solid var(--red);padding:12px;background:#fff4f4}.k{font-weight:900;color:var(--ink)}footer{border-top:2px solid var(--ink);padding:18px;text-align:center;color:#43566f}.small{font-size:12px;color:#5e6c7c}@media(max-width:740px){table{font-size:11px}.bar nav{width:100%;margin-left:0}.hero>div{padding-top:34px}}
 </style>
 </head>
 <body>
-<header><div class="bar"><span class="brand">VFM // 1.3</span><span class="tag">CORE FREEZE CANDIDATE</span><nav><a href="#freeze">Freeze</a><a href="#wire">Wire</a><a href="#integrity">Integrity</a><a href="#failure">Failure</a><a href="#proof">Proof</a><a href="#fixtures">Fixtures</a></nav></div></header>
-<div class="hero"><div><div>VIETFLEX MAP FORMAT // 27-09-2026</div><h1>VFM Core Binary Specification</h1><p>Đóng băng lớp container nhị phân của VFM 1.x đến mức hai implementation độc lập phải có thể sinh cùng một byte stream. Domain models như GIS Feature, Raster, BIM, 3D, Temporal, Sensor và GeoAI phát triển bằng profile, không phá Core.</p><div class="quote"><strong>Freeze the core. Extend by profile.</strong><br/><code>Single-file · little-endian · range-addressable · content-verifiable · profile-extensible</code></div></div></div>
+<header><div class="bar"><span class="brand">VFM // 1.3</span><span class="tag">CROSS-GIS PROTOCOL</span><nav><a href="#protocol">Protocol</a><a href="#freeze">Freeze</a><a href="#wire">Wire</a><a href="#integrity">Integrity</a><a href="#failure">Failure</a><a href="#proof">Proof</a><a href="#fixtures">Fixtures</a></nav></div></header>
+<div class="hero"><div><div>VIETFLEX MAP FORMAT // 27-09-2026</div><h1>VFM Cross-GIS Protocol</h1><p>VFM là giao thức liên thông giữa các tập liệu không gian dị thể. Mục tiêu không phải ép mọi dữ liệu vào một định dạng duy nhất, mà duy trì identity, hệ quy chiếu/frame, thời gian, quan hệ, provenance và integrity nhất quán giữa nhiều biểu diễn của cùng một thế giới.</p><div class="quote"><strong>Protocol first. File second.</strong><br/><code>VFM != .vfm · .vfm is one encoding of the VFM Protocol</code><br/><br/><strong>Freeze the core. Extend by profile.</strong><br/><code>Single-file · little-endian · range-addressable · content-verifiable · profile-extensible</code></div></div></div>
 <main>
-<section id="freeze"><h2>01 // Core Freeze Contract</h2><div class="grid"><div class="card"><span class="k">Magic</span><br/>56 46 4D 00 0D 0A 1A 0A</div><div class="card"><span class="k">Endian</span><br/>Little-endian ONLY</div><div class="card"><span class="k">Header</span><br/>256 bytes</div><div class="card"><span class="k">Directory Entry</span><br/>64 bytes</div><div class="card"><span class="k">Chunk Descriptor</span><br/>128 bytes</div><div class="card"><span class="k">HashRecord</span><br/>48 bytes</div><div class="card"><span class="k">Integrity</span><br/>CRC32C + SHA-256</div><div class="card"><span class="k">META/PROF</span><br/>Deterministic CBOR</div></div><p class="warn"><strong>Core 1.x invariant:</strong> đổi byte order, kích thước Header/Directory/Chunk Descriptor hoặc nghĩa field đã đóng băng phải lên major version mới. Reserved bits/bytes trong 1.x luôn bằng 0.</p></section>
+<section id="protocol"><h2>00 // VFM là gì?</h2>
+<p><strong>VFM là một Cross-GIS interoperability protocol.</strong> Nó chuẩn hóa cách các tập liệu không gian hiểu nhau, không bắt mọi tập liệu phải được lưu giống nhau.</p>
+<div class="grid">
+<div class="card"><span class="k">Identity</span><br/>Liên kết nhiều native ID vào cùng một thực thể vật lý hoặc logic.</div>
+<div class="card"><span class="k">Space / Frames</span><br/>CRS, vertical reference, axis order, đơn vị, local/world frame và transform.</div>
+<div class="card"><span class="k">Time / State</span><br/>Phân biệt thực thể ổn định với observation và trạng thái biến đổi theo thời gian.</div>
+<div class="card"><span class="k">Relations</span><br/>Topology, network, BIM, sensor, trajectory và cross-dataset relationships.</div>
+<div class="card"><span class="k">Semantics</span><br/>Binding schema/ontology mà không phá native schema của nguồn.</div>
+<div class="card"><span class="k">Provenance</span><br/>Nguồn, thời điểm, transform history, license, validation và hashes.</div>
+</div>
+<pre>GeoJSON / GeoParquet / GPKG ----\
+COG / imagery -------------------\
+LAS / LAZ ------------------------> VFM Protocol ---> WebGIS / BIM
+IFC / BIM -----------------------/                  Digital Twin
+3D Tiles / CityGML -------------/                   GeoAI / Robot
+Sensors / SLAM / trajectories --/</pre>
+<p class="ok"><strong>Bài toán gốc rễ:</strong> nhiều hệ thống có thể cùng mô tả một cây cầu, con đường, thửa đất hay tòa nhà nhưng không có cơ chế chắc chắn để biết đó là cùng một thực thể, trong cùng không gian và thời gian. VFM đặt lớp hợp đồng liên thông ở giữa các nguồn đó.</p>
+<h3>Protocol ≠ file</h3>
+<pre>VFM Protocol
+    |
+    +-- Logical interoperability model
+    |     identity / space / time / relations / provenance
+    |
+    +-- Domain Profiles
+    |     Feature / Raster / Point Cloud / 3D / BIM / Sensor / GeoAI
+    |
+    +-- Encodings / transports
+          .vfm binary / API / stream / database representation</pre>
+<p><code>VFM != .vfm</code>. Tệp <code>.vfm</code> là một encoding/container của protocol. Binary Core 1.3 ở các phần dưới được đóng băng để bảo đảm deterministic interoperability, trong khi domain semantics tiếp tục mở rộng bằng profile.</p>
+<p><a href="spec/v1.3/cross-gis-protocol.md"><strong>Đọc Cross-GIS Protocol Model</strong></a> · <a href="spec/v1.3/core-binary.md">Đọc Core Binary Specification</a></p>
+</section>
+<section id="freeze"><h2>01 // Core Freeze Contract</h2><p>Core Binary là <strong>Layer 1</strong> của VFM: deterministic container, addressing, integrity và profile discovery. Định vị Cross-GIS Protocol ở Layer 2 không thay đổi bất kỳ byte nào của Frozen Core 1.3.</p><div class="grid"><div class="card"><span class="k">Magic</span><br/>56 46 4D 00 0D 0A 1A 0A</div><div class="card"><span class="k">Endian</span><br/>Little-endian ONLY</div><div class="card"><span class="k">Header</span><br/>256 bytes</div><div class="card"><span class="k">Directory Entry</span><br/>64 bytes</div><div class="card"><span class="k">Chunk Descriptor</span><br/>128 bytes</div><div class="card"><span class="k">HashRecord</span><br/>48 bytes</div><div class="card"><span class="k">Integrity</span><br/>CRC32C + SHA-256</div><div class="card"><span class="k">META/PROF</span><br/>Deterministic CBOR</div></div><p class="warn"><strong>Core 1.x invariant:</strong> đổi byte order, kích thước Header/Directory/Chunk Descriptor hoặc nghĩa field đã đóng băng phải lên major version mới. Reserved bits/bytes trong 1.x luôn bằng 0.</p></section>
 <section id="wire"><h2>02 // Frozen Wire Layout</h2><pre>Byte 0
 +-----------------------------+
 | Fixed Header        256 B   |
@@ -73,5 +104,5 @@ unaligned-offset.vfm          -> E0015
 hash-ref-out-of-range.vfm     -> E0032
 bad-content-hash.vfm          -> E0033
 bad-root-digest.vfm           -> E0034</pre><p class="warn"><strong>Status:</strong> Core Freeze Candidate, chưa phải chuẩn OGC/ISO/IETF. Golden vectors tiếp theo nên tập trung Fast-Open, ZSTD và fuzz corpus nhưng không được thay đổi Frozen Core 1.x structs.</p></section>
-</main><footer>VFM 1.3 // Base27-CVNSS // Core Freeze Candidate // <a href="https://github.com/Base27-CVNSS/VFM">GitHub repository</a></footer>
+</main><footer>VFM 1.3 // Cross-GIS Protocol // Core Freeze Candidate // Base27-CVNSS // <a href="https://github.com/Base27-CVNSS/VFM">GitHub repository</a></footer>
 </body></html>
