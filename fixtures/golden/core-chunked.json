@@ -1,0 +1,10 @@
+{
+  "artifact_sha256": "252bffa51b99534ccbdce3a8c07e9044090a783e773dda031f51a5cffda4ef9c",
+  "file_size": 856,
+  "content_root_digest": "c47d99941fab1c8b379af406215d177e82361d25ca52fc823d8fd97be294069f",
+  "descriptor_offset": 568,
+  "chunk_offset": 696,
+  "chunk_id": 1001,
+  "chunk_sha256": "c0e1f7889818dae51f28b62a0bde60ba1a0233981ea57476b12a77760ae70daa",
+  "profile": "org.vietflex.fixture/1"
+}
