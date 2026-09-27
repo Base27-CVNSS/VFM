@@ -1,0 +1,14 @@
+{
+  "artifact_sha256": "5b65b13e2ae03aa3697dc869edf5168e6601be7465b1eba10331c145ebaaeefc",
+  "file_size": 584,
+  "dataset_uuid": "00112233445566778899aabbccddeeff",
+  "content_root_digest": "63978b1b7d47f8be14cf981d6eb0329c0378ff3dd186c1b51cc0e991fa695340",
+  "directory_digest": "ad876acbb0e71dbdac6594d71077b7728536e9d3a82f2b5e1361957addbbecea",
+  "manifest_digest": "46282c8cd999702c625fb2db983171c9a42aab348f892bcef49930f09fee6320",
+  "header_crc32c": "af78a8e6",
+  "sections": [
+    {"type":"META","logical_id":1,"offset":448,"length":27,"hash_ref":0},
+    {"type":"HASH","logical_id":2,"offset":488,"length":96,"hash_ref":null},
+    {"type":"PROF","logical_id":3,"offset":480,"length":1,"hash_ref":1}
+  ]
+}
